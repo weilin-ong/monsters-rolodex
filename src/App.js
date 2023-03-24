@@ -1,25 +1,57 @@
-import logo from './logo.svg';
-import './App.css';
+import { Component } from 'react';
+import './App.scss';
+import CardList from './components/card-list/CardList.component';
+import SearchBox from './components/search-box/SearchBox.component';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  //Previously, it was necessary to include a constructor() on React class components, but it's not required anymore.
+  // constructor() {
+  //   super();
+  //   this.state = {
+  //     monsters: null,
+  //     search: '',
+  //   };
+  // }
+
+  state = {
+    monsters: null,
+    search: '',
+  };
+
+  //runs after render
+  componentDidMount() {
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then((res) => res.json())
+      .then((data) =>
+        this.setState(
+          () => ({ monsters: data }) // <---- leave the ori data untouched
+          // () => console.log(this.state.monsters)
+        )
+      );
+  }
+
+  handleChange = (e) => {
+    const search = e.target.value.toLowerCase();
+    this.setState({ search });
+  };
+
+  render() {
+    const { state, handleChange } = this;
+    const { monsters, search } = state;
+
+    //filter the ori data set only
+    const filtered =
+      monsters !== null &&
+      monsters.filter((el) => el.name.toLowerCase().includes(search));
+
+    return (
+      <div className='App'>
+        <h1>Monster</h1>
+        <SearchBox handleChange={handleChange} />
+        <CardList filtered={filtered} />
+      </div>
+    );
+  }
 }
 
 export default App;
